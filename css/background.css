@@ -1,0 +1,27 @@
+.background {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+    .background > .sky {
+        display: inline-block;
+        width: 100%;
+        height: 45%;
+        background: linear-gradient(#0D4890, #A8FFFF);
+    }
+        .background > .sky > .sun {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            background-color: #fff;
+            margin-top: 40px;
+            margin-left: calc(50% - 40px);
+            border-radius: 50%;
+            box-shadow: 0 0 80px #fff;
+        }
+    .background > .ground {
+        display: inline-block;
+        width: 100%;
+        height: 55%;
+        background: linear-gradient(#AFD049, #8FB115);
+    }

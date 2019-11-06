@@ -1,0 +1,49 @@
+.track {
+    display: inline-block;
+    height: 55%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    text-align: center;
+    perspective: 50px;
+    perspective-origin: 50% 0%;
+}
+    .track > .road {
+        display: inline-block;
+        margin-top: -90px;
+        height: 100%;
+        width: 60%;
+        background: linear-gradient(#4F4F4D, #525252);
+        transform: rotateX(50deg);
+    }
+    .track > .road > .line {
+        display: inline-block;
+        height: 200%;
+        width: 2.5%;
+        float: left;
+    }
+        .track > .road > .line + .line {
+            margin-left: 30%;
+        }
+        .track > .road > .line.white-line {
+            background: linear-gradient(#90959A, #E8EADC);
+        }
+        .track > .road > .line.red-line {
+            background: linear-gradient(#90959A, #F01846);
+        }
+
+.car {
+    display: inline-block;
+    height: 90%;
+    width: 20%;
+    position: fixed;
+    bottom: 5%;
+    left: 40%;
+    z-index: 1000;
+    background-image: url(../img/car/car-1.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: bottom center;
+}
