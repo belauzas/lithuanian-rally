@@ -2,6 +2,7 @@
 
 let start = null;
 let frame = 0;
+let turnSize = 1;       // %
 
 const car = document.querySelector('.car');
 
@@ -27,11 +28,11 @@ window.addEventListener('keydown', (e) => {
             break;
 
         case 37:        // left
-            data.turn = -0.5;
+            data.turn = -turnSize;
             break;
             
         case 39:        // right
-            data.turn = 0.5;
+            data.turn = turnSize;
             break;
 
         case 40:        // bottom
