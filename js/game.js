@@ -171,22 +171,25 @@ function updateSpeedometer() {
     let newSpeed = speed.current;
     if ( key.up ) newSpeed++;
     if ( key.down ) newSpeed--;
+    if ( !key.up && !key.down ) newSpeed -= speedIncrement * 0.02;
     
     if ( newSpeed >= 0 &&
          newSpeed <= 240 ) {
         speed.current = newSpeed;
         
         let frameTime = 0;
-        if ( speed.current !== 0 ) {
+        if ( newSpeed !== 0 ) {
             // frameTime = speed.frame.max - speedIncrement * newSpeed;
             // frameTime = (speed.frame.max - speed.frame.min) / newSpeed + speed.frame.min;
             frameTime = ( (speed.frame.max - speed.frame.min) / newSpeed + speed.frame.min + speed.frame.max - speedIncrement * newSpeed ) / 2
         }
         speed.frame.time = frameTime;
 
-        DOM.speedometer.textContent = newSpeed;
+        DOM.speedometer.textContent = Math.round(newSpeed);
+    } else {
+        newSpeed = 0;
+        speed.frame.time = 0;
     }
-    car.updateSpeed = 0;
 }
 
 function updateRoadLineAnimation() {
