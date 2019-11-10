@@ -10,14 +10,15 @@ const car = {
         current: (100 - carWidth) / 2,
         min: 0,
         max: 100 - carWidth
-    }
+    },
+    inLine: 1           // [0..2]
 }
 
 const wheel = {
     maxWheelTurn: 120,      // deg of rotation
     turningSpeed: 120,      // deg / sec
     autoSteeringCoef: 0.3,  // deg / sec
-    maxTurn: 0.5,             // % or road width
+    maxTurn: 0.5,           // % or road width
     turnedDegrees: 0        // current turn angle [-maxTurn ... maxTurn]
 }
 
@@ -25,17 +26,42 @@ const speed = {
     max: 240,
     frame: {
         min: 50,
-        max: 1200
+        max: 1200,
+        time: 0
     },
-    current: 0
+    current: 240
 }
 const speedIncrement = (speed.frame.max - speed.frame.min) / speed.max;
 
+const balls = {
+    total: 0,
+    list: [],
+    catchHeight: {
+        min: 53,
+        max: 55,
+        remove: 60
+    },
+    maxCount: 12,
+    speed: 10,          // % per sec at max car speed
+    points: 0,
+}
+
+const points = {
+    total: 0,
+    animation: {
+        duration: 0.4,    // seconds
+        current: 0
+    },
+    update: false
+}
+
 const DOM = {
     car: document.querySelector('.car'),
+    road: document.querySelector('.road'),
     roadLines: document.querySelectorAll('.road > .line'),
     speedometer: document.querySelector('.car-info > .speed > .value'),
-    wheel: document.querySelector('.wheel')
+    wheel: document.querySelector('.wheel'),
+    points: document.querySelector('.game-info > .points > .value')
 }
 
 const key = {
@@ -55,9 +81,12 @@ function step(timestamp) {
     updateSpeedometer();
     updateRoadLineAnimation();
     updateGasMeter();
-    moveBalls();
+    updateBalls();
     updatePoints();
 
+    // current frame rate
+    // console.log( Math.floor(1/dt) );
+    
     lastTime = time;
     window.requestAnimationFrame(step);
 }
@@ -122,18 +151,17 @@ function updateSpeedometer() {
             // frameTime = (speed.frame.max - speed.frame.min) / newSpeed + speed.frame.min;
             frameTime = ( (speed.frame.max - speed.frame.min) / newSpeed + speed.frame.min + speed.frame.max - speedIncrement * newSpeed ) / 2
         }
+        speed.frame.time = frameTime;
 
         DOM.speedometer.textContent = newSpeed;
-
-        for ( let i=0; i<4; i++ ) {
-            DOM.roadLines[i].style.animationDuration = frameTime + 'ms';
-        }
     }
     car.updateSpeed = 0;
 }
 
 function updateRoadLineAnimation() {
-
+    for ( let i=0; i<4; i++ ) {
+        DOM.roadLines[i].style.animationDuration = speed.frame.time + 'ms';
+    }
 }
 
 function turnStreeringWheel() {
@@ -170,10 +198,75 @@ function updateGasMeter() {
 
 }
 
-function moveBalls() {
+function updateBalls() {
+    // create new balls if available
+    if ( balls.list.length < balls.maxCount ) {
+        if ( Math.random() < 0.01 * (speed.current / speed.max) ) {
+            balls.list.push({
+                id: balls.total,
+                track: Math.floor(Math.random() * 3),
+                distance: 0
+            });
 
+            balls.total++;
+
+            // append new ball to DOM
+            const ballData = balls.list[balls.list.length-1];
+            const top = 'top: ' + ballData.distance + '%;';
+            // const top = 'top: ' + (ballData.id * 5) + '%;';
+            const left = 'left: calc(((100% / 3) * (2 * '+ballData.track+' + 1) - 100px) / 2);';
+            const ball = '<div class="ball" data-id="'+ballData.id+'" style="'+top+left+'"></div>';
+            DOM.road.insertAdjacentHTML('beforeend', ball);
+        }
+    }
+
+    // remove balls that have passed window
+    balls.list = balls.list.filter(ball => {
+        if ( ball.distance > balls.catchHeight.remove ) {
+            DOM.road.querySelector('.ball[data-id="'+ball.id+'"]').remove();
+        }
+        return ball.distance <= balls.catchHeight.remove;
+    });
+
+    // move balls down
+    for ( let i=0; i<balls.list.length; i++ ) {
+        const ball = balls.list[i];
+        const newPosition = ball.distance + (speed.current / speed.max) * dt * balls.speed;
+        balls.list[i].distance = newPosition;
+        DOM.road.querySelector('.ball[data-id="'+ball.id+'"]').style.top = newPosition + '%';
+    }
+    
+    // check for any hits with car and remove
+    for ( let i=0; i<balls.list.length; i++ ) {
+        const ball = balls.list[i];
+        if ( ball.distance < balls.catchHeight.min ||
+            ball.distance > balls.catchHeight.max ) {
+            continue;
+        }
+        
+        if ( ball.track !== car.inLine ) {
+            continue;
+        }
+        points.total++;
+        points.update = true;
+        balls.list = balls.list.filter(b => b.id !== ball.id );
+        DOM.road.querySelector('.ball[data-id="'+ball.id+'"]').remove();
+    }
 }
 
 function updatePoints() {
+    if ( points.update ) {
+        DOM.points.textContent = points.total;
+        points.update = false;
+        points.animation.current = 0;
+    }
+    
+    points.animation.current += dt;
 
+    if ( points.animation.current < points.animation.duration ) {
+        const scale = 0.7 + 1.3 * (points.animation.current / points.animation.duration);
+        DOM.points.style.transform = 'scale('+ scale +')';
+    } else {
+        DOM.points.style.transform = 'scale(1)';
+    }
 }

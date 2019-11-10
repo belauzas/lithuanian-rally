@@ -1,0 +1,29 @@
+.game-info {
+    display: inline-block;
+    position: absolute;
+    width: 300px;
+    top: 40px;
+    left: 40px;
+}
+    .game-info > .points {
+        display: inline-block;
+        width: 100%;
+        font-style: italic;
+        color: #fff;
+        font-family: fantasy;
+    }
+        .game-info > .points > * {
+            display: inline-block;
+            float: right;
+            font-size: 32px;
+            line-height: 32px;
+            font-family: inherit;
+        }
+        .game-info > .points > .value {
+            font-size: 100px;
+            line-height: 85px;
+            margin-right: 25px;
+            font-weight: 900;
+            letter-spacing: 10px;
+            transform-origin: center;
+        }

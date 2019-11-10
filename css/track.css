@@ -64,3 +64,15 @@
     background-size: contain;
     background-position: bottom center;
 }
+
+.ball {
+    display: inline-block;
+    position: absolute;
+    top: 0%;
+    top: 40%;
+    left: calc((100% - 300px) / 6);
+    width: 100px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #F01846;
+}
