@@ -4,13 +4,28 @@ let lastTime = Date.now();
 let time = 0;
 let dt = 0;
 
+const DOM = {
+    car: document.querySelector('.car'),
+    road: document.querySelector('.road'),
+    roadLines: document.querySelectorAll('.road > .line'),
+    speedometer: document.querySelector('.car-info > .speed > .value'),
+    wheel: document.querySelector('.wheel'),
+    points: document.querySelector('.game-info > .points > .value')
+}
+
+const windowSize = {
+    width: window.innerWidth
+}
 const carWidth = 20;    // % of window
 const car = {
+    width: parseInt(getComputedStyle(DOM.car).width),
     position: {
         current: (100 - carWidth) / 2,
         min: 0,
         max: 100 - carWidth
     },
+    linesCount: 3,
+    lines: [],
     inLine: 1           // [0..2]
 }
 
@@ -55,15 +70,6 @@ const points = {
     update: false
 }
 
-const DOM = {
-    car: document.querySelector('.car'),
-    road: document.querySelector('.road'),
-    roadLines: document.querySelectorAll('.road > .line'),
-    speedometer: document.querySelector('.car-info > .speed > .value'),
-    wheel: document.querySelector('.wheel'),
-    points: document.querySelector('.game-info > .points > .value')
-}
-
 const key = {
     left: false,
     up: false,
@@ -71,6 +77,10 @@ const key = {
     down: false
 }
 
+function init() {
+   calcLineSizes(); 
+}
+init();
 
 function step(timestamp) {
     time = Date.now();
@@ -117,6 +127,16 @@ window.addEventListener('keyup', (e) => {
     }
 })
 
+function calcLineSizes() {
+    for ( let i=0; i<car.linesCount; i++ ) {
+        // const min = 100 / car.linesCount * i + (100 / car.linesCount / 6);
+        // const max = 100 / car.linesCount * (i+1) - (100 / car.linesCount / 6);
+        const min = 100 / car.linesCount * i;
+        const max = 100 / car.linesCount * (i+1);
+        car.lines.push([min, max]);
+    }
+}
+
 function moveCar() {
     if ( wheel.turnedDegrees === 0 ) {
         return;
@@ -128,6 +148,17 @@ function moveCar() {
         if ( turn > car.position.min && turn < car.position.max ) {
             car.position.current = turn;
             DOM.car.style.left = turn + '%';
+            updateCarInLineValue();
+        }
+    }
+}
+
+function updateCarInLineValue() {
+    car.inLine = null;
+    for ( let i=0; i<car.linesCount; i++ ) {
+        if ( car.lines[i][0] <= car.position.current && car.lines[i][1] >= car.position.current + carWidth ) {
+            car.inLine = i;
+            break;
         }
     }
 }
