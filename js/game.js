@@ -44,7 +44,7 @@ const speed = {
         max: 1200,
         time: 0
     },
-    current: 240
+    current: 0
 }
 const speedIncrement = (speed.frame.max - speed.frame.min) / speed.max;
 
